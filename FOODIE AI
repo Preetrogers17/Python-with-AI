@@ -1,0 +1,88 @@
+import google.generativeai as genai
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+
+# 🎨 Colors inspired by food
+BG_COLOR = "#fff5e6"        # Creamy background
+BTN_COLOR = "#ffad60"       # Soft orange (like mango)
+BTN_HOVER = "#ff914d"       # Slightly darker on hover
+TEXT_BG = "#fff0d1"         # Light yellow for result area
+TEXT_COLOR = "#3e3e3e"      # Soft black for readability
+
+# 🔑 Gemini API config
+genai.configure(api_key="AIzaSyD2vGWRNHfwklQR6ZwTYaDNxaoijFubHl8")
+model = genai.GenerativeModel('gemini-1.5-flash-latest')
+
+# 🔎 Function to get response
+def ask_gemini(prompt, title):
+    try:
+        response = model.generate_content(prompt)
+        result_box.config(state='normal')
+        result_box.delete('1.0', tk.END)
+        result_box.insert(tk.END, f"{title}\n\n{response.text}")
+        result_box.config(state='disabled')
+    except Exception as e:
+        messagebox.showerror("Error", f"Something went wrong: {e}")
+
+# 🎯 Main action
+def handle_choice(choice):
+    food = food_entry.get().strip()
+    if not food:
+        messagebox.showwarning("Input Missing", "Please enter a food item first.")
+        return
+
+    if choice == "1":
+        prompt = f"""**Cook** – Provide a step-by-step recipe for how to cook the {food} at home. Mention ingredients, cooking time, and tips if any."""
+        ask_gemini(prompt, f"🍳 Recipe for {food}")
+    elif choice == "2":
+        prompt = f"""**Food Insights** – Generate:
+- Nutritional information (calories, proteins, fats, carbs)
+- A short calorie chart
+- 2–3 pros (benefits of eating this food)
+- 2–3 cons (health warnings or overconsumption risks) for the {food}."""
+        ask_gemini(prompt, f"📊 Food Insights for {food}")
+    elif choice == "3":
+        prompt = f"""**Order** – Show a simulated list of 3 nearby restaurants where {food} is available. For each restaurant, include:
+- Restaurant name
+- A short review comment
+- Distance (in km)
+- Rating (out of 5)
+- Price of the item."""
+        ask_gemini(prompt, f"🍴 Places to Order {food}")
+
+# 🍲 GUI Setup
+root = tk.Tk()
+root.title("🍽️ Gemini Cook Assistant")
+root.configure(bg=BG_COLOR)
+root.geometry("720x600")
+
+# 🧾 Title Label
+tk.Label(root, text="Gemini Cook Assistant", font=("Helvetica", 20, "bold"), bg=BG_COLOR, fg="#ff6600").pack(pady=10)
+
+# 🍜 Food Input
+tk.Label(root, text="Enter a Food Item:", font=("Helvetica", 14), bg=BG_COLOR).pack(pady=5)
+food_entry = tk.Entry(root, font=("Helvetica", 14), width=40)
+food_entry.pack(pady=5)
+
+# 🍴 Buttons Frame
+btn_frame = tk.Frame(root, bg=BG_COLOR)
+btn_frame.pack(pady=10)
+
+def styled_button(text, command):
+    btn = tk.Button(btn_frame, text=text, font=("Helvetica", 12, "bold"),
+                    bg=BTN_COLOR, fg="white", activebackground=BTN_HOVER,
+                    width=18, padx=10, pady=6, command=command)
+    btn.pack(side=tk.LEFT, padx=10)
+    return btn
+
+styled_button("🍳 Cook", lambda: handle_choice("1"))
+styled_button("📊 Food Insights", lambda: handle_choice("2"))
+styled_button("🍴 Order", lambda: handle_choice("3"))
+
+# 📋 Result Area
+tk.Label(root, text="Result:", font=("Helvetica", 14, "bold"), bg=BG_COLOR).pack(pady=10)
+result_box = scrolledtext.ScrolledText(root, font=("Helvetica", 12), width=80, height=20,
+                                       bg=TEXT_BG, fg=TEXT_COLOR, wrap=tk.WORD, state='disabled')
+result_box.pack(padx=20, pady=10)
+
+root.mainloop()
