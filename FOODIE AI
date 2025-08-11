@@ -10,7 +10,7 @@ TEXT_BG = "#fff0d1"         # Light yellow for result area
 TEXT_COLOR = "#3e3e3e"      # Soft black for readability
 
 # 🔑 Gemini API config
-genai.configure(api_key="AIzaSyD2vGWRNHfwklQR6ZwTYaDNxaoijFubHl8")
+genai.configure(api_key="API KEY ")
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 # 🔎 Function to get response
