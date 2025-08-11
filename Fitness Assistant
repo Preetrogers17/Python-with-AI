@@ -1,0 +1,70 @@
+import google.generativeai as genai
+
+# 🔑 Gemini API config
+genai.configure(api_key="AIzaSyD2vGWRNHfwklQR6ZwTYaDNxaoijFubHl8")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
+
+# Function to calculate BMI
+def calculate_bmi(weight_kg, height_m):
+    return weight_kg / (height_m ** 2)
+
+# Main function
+def fitness_assistant():
+    # Take user details
+    weight = float(input("Enter your weight in kg: "))
+    height = float(input("Enter your height in meters: "))
+    age = int(input("Enter your age: "))
+
+    # Calculate BMI
+    bmi = calculate_bmi(weight, height)
+    print(f"\nYour BMI is: {bmi:.2f}")
+
+    # BMI Category
+    if bmi < 18.5:
+        print("Category: Underweight")
+    elif 18.5 <= bmi < 25:
+        print("Category: Normal weight")
+    elif 25 <= bmi < 30:
+        print("Category: Overweight")
+    else:
+        print("Category: Obese")
+
+    # User goals
+    print("\nWhat is your goal?")
+    print("1. Gain weight (muscle)")
+    print("2. Lose fat")
+    print("3. Stay fit")
+    goal_choice = input("Enter your choice (1/2/3): ")
+
+    # Workout mode
+    print("\nChoose your workout mode:")
+    print("1. Gym")
+    print("2. Home workout")
+    print("3. Simple cardio")
+    workout_choice = input("Enter your choice (1/2/3): ")
+
+    # Prepare prompt for Gemini
+    prompt = f"""
+    You are a fitness doctor and nutritionist.
+    User details:
+    - Weight: {weight} kg
+    - Height: {height} m
+    - Age: {age}
+    - BMI: {bmi:.2f}
+    Goal: {"Gain weight (muscle)" if goal_choice=="1" else "Lose fat" if goal_choice=="2" else "Stay fit"}
+    Workout mode: {"Gym" if workout_choice=="1" else "Home workout" if workout_choice=="2" else "Simple cardio"}
+
+    Based on these details:
+    1. Generate a complete workout plan (with sets & reps) suitable for the user's goal & workout mode.
+    2. Suggest a budget-friendly diet plan that will give results according to BMI & goal.
+    """
+
+    # Get response from Gemini
+    response = model.generate_content(prompt)
+
+    # Show results
+    print("\n💪 Here is your customized plan:\n")
+    print(response.text)
+
+# Run the assistant
+fitness_assistant()
