@@ -1,0 +1,139 @@
+import google.generativeai as genai
+
+# 🔑 Gemini API config
+genai.configure(api_key="API KEY HERE ")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
+
+
+def Suggest_Movie():
+    # Start a chat session
+    chat = model.start_chat()
+
+    # Initial instruction for the AI
+    system_prompt = """
+    You are a friendly movie guy.
+    - First, greet the user.
+    - Ask them a few questions about what type of movie they want to watch
+      (genre, mood, length).
+    - Then, based on their answers, suggest 1–4 movies.
+    -
+    - Keep the conversation going naturally until they say goodbye.
+    """
+
+    # Send initial message to AI
+    response = chat.send_message(system_prompt)
+    print(response.text)
+
+    # Loop to keep the chat going
+    while True:
+        user_message = input("\nYou: ")
+        ai_response = chat.send_message(user_message)
+        print(f"\nAI: {ai_response.text}")
+
+        if any(exit_word in user_message.lower() for exit_word in ["bye", "goodbye", "exit", "quit"]):
+            print("📖 Happy reading!")
+            break
+
+
+# Run the assistant
+Suggest_Movie()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
