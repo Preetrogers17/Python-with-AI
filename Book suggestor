@@ -1,0 +1,50 @@
+import google.generativeai as genai
+
+# Apni Gemini API key yahan daalo
+API_KEY = "API KEY "
+
+# Configure Gemini
+genai.configure(api_key=API_KEY)
+
+# Model: Gemini 1.5 Flash (fast & cheap)
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+# System-style behavior
+SYSTEM_CONTEXT = (
+    "You are a friendly librarian assistant. "
+    "First ask 2-3 short questions (reading mood, genre, length). "
+    "Then recommend 3-5 books with: Title — Author — 1-line summary. "
+    "Keep answers concise. If user gives genre, skip asking basics."
+)
+
+history = []  # Store last few turns
+
+def chat_turn(user_text: str) -> str:
+    # Build context + last few exchanges
+    convo = [
+        f"System: {SYSTEM_CONTEXT}",
+        *[f"User: {u}\nAssistant: {a}" for (u, a) in history[-5:]],
+        f"User: {user_text}",
+        "Assistant:"
+    ]
+    prompt = "\n\n".join(convo)
+
+    resp = model.generate_content(
+        prompt,
+        generation_config={
+            "temperature": 0.7,
+            "max_output_tokens": 500,
+        }
+    )
+    return resp.text.strip()
+
+print("📚 Gemini Book Librarian (type 'exit' to quit)")
+while True:
+    user = input("\nYou: ").strip()
+    if user.lower() in ("exit", "quit", "bye"):
+        print("Assistant: Happy reading! 👋")
+        break
+
+    reply = chat_turn(user)
+    print("Assistant:", reply)
+    history.append((user, reply))
